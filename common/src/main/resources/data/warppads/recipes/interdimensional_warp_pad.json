@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ABA",
+    "CDC",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:chorus_fruit"
+    },
+    "B": {
+      "item": "minecraft:blaze_powder"
+    },
+    "C": {
+      "item": "minecraft:ghast_tear"
+    },
+    "D": {
+      "item": "warppads:warp_pad"
+    }
+  },
+  "result": {
+    "item": "warppads:interdimensional_warp_pad"
+  }
+}

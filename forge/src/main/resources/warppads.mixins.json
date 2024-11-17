@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "io.github.thatpreston.warppads.forge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "WarpPadBlockEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
