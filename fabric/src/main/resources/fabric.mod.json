@@ -8,8 +8,8 @@
     "ThatPreston"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/warp-pads",
+    "sources": "https://github.com/ThatPreston/WarpPads"
   },
   "license": "${mod_license}",
   "icon": "icon.png",
