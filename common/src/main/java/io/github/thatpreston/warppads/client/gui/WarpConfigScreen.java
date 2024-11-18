@@ -19,7 +19,6 @@ public class WarpConfigScreen extends AbstractContainerScreen<WarpConfigMenu> {
         imageHeight = 142;
         inventoryLabelY = 48;
         priority = menu.getInfo().getPriority();
-        System.out.println(priority);
     }
     @Override
     protected void init() {
