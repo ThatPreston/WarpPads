@@ -18,28 +18,26 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class WarpSelectionMenu extends AbstractContainerMenu {
     public static final Component TITLE = Component.translatable("container.warppads.warp_selection");
     private final ContainerLevelAccess levelAccess;
     private final BlockPos pos;
-    private final Set<WarpOption> sortedWarpOptions;
+    private final List<WarpOption> warpOptions;
     public WarpSelectionMenu(int id, ContainerLevelAccess levelAccess, BlockPos pos, List<WarpPadInfoGroup> warpPadGroups) {
         super(RegistryHandler.WARP_SELECTION.get(), id);
         this.levelAccess = levelAccess;
         this.pos = pos;
-        this.sortedWarpOptions = new TreeSet<>(Comparator.comparingInt(WarpOption::getPriority).reversed());
+        this.warpOptions = new ArrayList<>();
         for(WarpPadInfoGroup group : warpPadGroups) {
             for(WarpPadInfo info : group.getWarpPads()) {
                 if(!info.getPos().equals(pos)) {
-                    sortedWarpOptions.add(new WarpOption(info, group.getLevelKey()));
+                    warpOptions.add(new WarpOption(info, group.getLevelKey()));
                 }
             }
         }
+        warpOptions.sort(Comparator.comparingInt(WarpOption::getPriority).reversed());
     }
     public WarpSelectionMenu(int id, Inventory inventory, FriendlyByteBuf data) {
         this(id, ContainerLevelAccess.NULL, data.readBlockPos(), WarpPadInfoGroup.readList(data));
@@ -55,8 +53,8 @@ public class WarpSelectionMenu extends AbstractContainerMenu {
     public boolean stillValid(Player player) {
         return stillValid(levelAccess, player, RegistryHandler.WARP_PAD_BLOCK.get()) || stillValid(levelAccess, player, RegistryHandler.INTERDIMENSIONAL_WARP_PAD_BLOCK.get());
     }
-    public Set<WarpOption> getWarpOptions() {
-        return sortedWarpOptions;
+    public List<WarpOption> getWarpOptions() {
+        return warpOptions;
     }
     public void selectWarpOption(WarpOption option) {
         PacketHandler.CHANNEL.sendToServer(new WarpRequest(pos, option.getPos(), option.levelKey()));
