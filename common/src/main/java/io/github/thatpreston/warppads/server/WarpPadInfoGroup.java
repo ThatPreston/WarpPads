@@ -13,20 +13,24 @@ import net.minecraft.world.level.Level;
 import java.util.*;
 
 public class WarpPadInfoGroup {
-    private final Map<BlockPos, WarpPadInfo> warpPadMap = new HashMap<>();
     private final List<WarpPadInfo> warpPadList = new ArrayList<>();
     private final ResourceKey<Level> levelKey;
+    private Map<BlockPos, WarpPadInfo> warpPadMap;
     private boolean dirty;
     public WarpPadInfoGroup(ResourceKey<Level> key) {
         this.levelKey = key;
+        this.warpPadMap = new HashMap<>();
     }
     public WarpPadInfoGroup(CompoundTag tag) {
-        Optional<ResourceKey<Level>> key = Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, tag.get("level")).result();
-        levelKey = key.orElse(Level.OVERWORLD);
+        this(Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, tag.get("level")).result().orElse(Level.OVERWORLD));
         ListTag list = tag.getList("warpPads", Tag.TAG_COMPOUND);
         for(Tag listTag : list) {
-            if(listTag instanceof CompoundTag info) {
-                addWarpPad(new WarpPadInfo(info));
+            if(listTag instanceof CompoundTag infoTag) {
+                WarpPadInfo info = new WarpPadInfo(infoTag);
+                if(!warpPadMap.containsKey(info.getPos())) {
+                    warpPadList.add(info);
+                    warpPadMap.put(info.getPos(), info);
+                }
             }
         }
     }
