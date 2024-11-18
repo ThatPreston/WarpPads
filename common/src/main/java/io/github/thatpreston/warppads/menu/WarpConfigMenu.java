@@ -17,7 +17,6 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 public class WarpConfigMenu extends AbstractContainerMenu {
     public static final Component TITLE = Component.translatable("container.warppads.warp_config");
@@ -28,7 +27,7 @@ public class WarpConfigMenu extends AbstractContainerMenu {
         super(RegistryHandler.WARP_CONFIG.get(), id);
         this.levelAccess = levelAccess;
         this.info = info;
-        this.dyeSlot = this.addSlot(new Slot(container, 0, 126, 19));
+        this.dyeSlot = this.addSlot(new DyeSlot(container, 0, 126, 19));
         for(int x = 0; x < 9; x++) {
             for(int y = 0; y < 3; y++) {
                 this.addSlot(new Slot(inventory, x + 9 * (y + 1), 8 + x * 18, 60 + y * 18));
@@ -39,37 +38,27 @@ public class WarpConfigMenu extends AbstractContainerMenu {
         }
     }
     public WarpConfigMenu(int id, Inventory inventory, FriendlyByteBuf data) {
-        this(id, inventory, ContainerLevelAccess.NULL, new WarpPadInfo(data), new SimpleContainer(1) {
-            @Override
-            public int getMaxStackSize() {
-                return 1;
-            }
-            @Override
-            public boolean canPlaceItem(int slot, @NotNull ItemStack stack) {
-                return stack.getItem() instanceof DyeItem;
-            }
-        });
+        this(id, inventory, ContainerLevelAccess.NULL, new WarpPadInfo(data), new SimpleContainer(1));
     }
     public static MenuProvider getMenuProvider(WarpPadInfo info, Container container) {
         return new SimpleMenuProvider((id, inventory, player) -> new WarpConfigMenu(id, inventory, ContainerLevelAccess.create(player.level(), info.getPos()), info, container), TITLE);
     }
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        ItemStack empty = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if(slot.hasItem()) {
             ItemStack stack = slot.getItem();
             if(index == 0) {
-                if(!this.moveItemStackTo(stack, 1, 37, true)) {
-                    return empty;
+                if(!moveItemStackTo(stack, 1, 37, false)) {
+                    return ItemStack.EMPTY;
                 }
-            } else if(dyeSlot.container.canPlaceItem(index, stack)) {
-                if(!this.moveItemStackTo(stack, 0, 1, true)) {
-                    return empty;
+            } else if(stack.getItem() instanceof DyeItem && !dyeSlot.hasItem()) {
+                if(!moveItemStackTo(stack, 0, 1, false)) {
+                    return ItemStack.EMPTY;
                 }
             }
         }
-        return empty;
+        return ItemStack.EMPTY;
     }
     @Override
     public boolean stillValid(Player player) {
@@ -85,5 +74,18 @@ public class WarpConfigMenu extends AbstractContainerMenu {
     }
     public boolean hasDye() {
         return !dyeSlot.getItem().isEmpty();
+    }
+    private static class DyeSlot extends Slot {
+        public DyeSlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+        @Override
+        public int getMaxStackSize() {
+            return 1;
+        }
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return stack.getItem() instanceof DyeItem;
+        }
     }
 }
